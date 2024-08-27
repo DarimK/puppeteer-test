@@ -1,4 +1,4 @@
-const socket = io("http://localhost:3000");
+const socket = io((window.location.hostname === "localhost") ? "/" : "https://puppeteer-test-ptgg.onrender.com/");
 const keys = {};
 const mouse = {};
 const lastMousePos = {};
