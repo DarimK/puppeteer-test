@@ -30,8 +30,10 @@ app.use(express.static(path.join(__dirname, '..', 'client')));
 io.on('connection', async (socket) => {
     console.log('New client connected');
     const device = { ...puppeteer.KnownDevices['iPhone 15 Pro'] };
-    // device.name = 'Amogus';
+    device.name = 'Amogus';
     device.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36';
+    device.viewport.width = 720;
+    device.viewport.height = 480;
     device.viewport.deviceScaleFactor = 1;
     device.viewport.isMobile = false;
     device.viewport.hasTouch = false;
@@ -45,17 +47,54 @@ io.on('connection', async (socket) => {
         executablePath: process.env.NODE_ENV === "production" ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath(),
         headless: true,
         args: [
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            "--no-zygote"
+            '--incognito',
+            '--enable-low-end-device-mode',
+            '--disable-features=FileSystemAPI',
+            '--disable-file-system',
+            '--no-file-access-from-files',
+            '--enable-fast-text-encoding',
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
+            '--disable-setuid-sandbox',
+            '--no-sandbox',
+            '--no-zygote',
+            '--disable-software-rasterizer', // Offload rendering to CPU
+            '--no-first-run',
+            '--no-default-browser-check',
+            '--disable-extensions',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-renderer-backgrounding',
+            '--mute-audio', // Disable audio
+            '--disable-background-networking',
+            '--disable-default-apps',
+            '--disable-features=site-per-process', // Reduces memory overhead
+            '--disable-background-timer-throttling', // Prevents Chrome from throttling timers in the background
+            '--disable-crash-reporter', // Disables crash reporter
+            '--disable-sync', // Disables syncing to reduce background load
+            '--disable-component-extensions-with-background-pages', // Disables extensions that run background pages
+            '--disable-speech-api',
+            '--disable-prompt-on-repost', // Disables prompts related to reposting data
+            '--disable-hang-monitor', // Disables the hang monitor that tries to diagnose browser hangs
+            '--noerrdialogs', // Disables all error dialogs
+            '--disable-domain-reliability', // Disables Chrome's domain reliability feature
+            '--disable-translate', // Disables the translation feature
+            '--disable-renderer-accessibility',
+            '--disable-threaded-scrolling',
+            '--disable-threaded-animation',
+            '--disable-accelerated-2d-canvas',
+            '--disable-accelerated-mjpeg-decode',
+            '--disable-accelerated-video-decode',
+            '--disable-background-media-suspend',
+            '--disable-background-video-track',
+            '--disable-devtools',
         ]
     });
 
     async function startScreencast(tabId) {
         await tabs[tabId].client.send('Page.startScreencast', {
             format: 'jpeg',
-            quality: 75,
-            everyNthFrame: 2
+            quality: 25,
+            everyNthFrame: 4
         });
     }
 
@@ -67,7 +106,6 @@ io.on('connection', async (socket) => {
         tabs[lastTabId] = {};
         tabs[lastTabId].page = page || await browser.newPage();
         await tabs[lastTabId].page.emulate(device);
-        await tabs[lastTabId].page.setViewport({ width: 1500, height: 1000 });
         tabs[lastTabId].page.on('dialog', async (dialog) => {
             console.log(dialog.message());
             await dialog.accept(); // might show usr laret
@@ -181,7 +219,7 @@ io.on('connection', async (socket) => {
 
     async function capture() {
         try {
-            const screenshot = await tabs[activeTabId].page.screenshot({ type: 'jpeg', quality: 75 });
+            const screenshot = await tabs[activeTabId].page.screenshot({ type: 'jpeg', quality: 25 });
             socket.emit('screenshot', screenshot.toString('base64'));
         } catch (error) {
             console.error(error);
