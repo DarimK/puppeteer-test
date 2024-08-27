@@ -1,0 +1,19 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#tabs,
+#controls {
+    height: 5vh;
+}
+
+#screen {
+    width: auto;
+    height: 90vh;
+    touch-action: none;
+    -webkit-user-drag: none;
+    user-select: none;
+}
