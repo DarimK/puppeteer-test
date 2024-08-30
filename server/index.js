@@ -46,6 +46,7 @@ io.on('connection', async (socket) => {
     const browser = await puppeteer.launch({
         executablePath: process.env.NODE_ENV === "production" ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath(),
         headless: true,
+        protocolTimeout: 5000,
         args: [
             '--incognito',
             '--enable-low-end-device-mode',
@@ -91,15 +92,15 @@ io.on('connection', async (socket) => {
     });
 
     async function startScreencast(tabId) {
-        await tabs[tabId].client.send('Page.startScreencast', {
-            format: 'jpeg',
-            quality: 25,
-            everyNthFrame: 4
-        });
+        // await tabs[tabId].client.send('Page.startScreencast', {
+        //     format: 'jpeg',
+        //     quality: 25,
+        //     everyNthFrame: 4
+        // });
     }
 
     async function stopScreencast(tabId) {
-        await tabs[tabId].client.send('Page.stopScreencast');
+        // await tabs[tabId].client.send('Page.stopScreencast');
     };
 
     async function createTab(page = undefined) {
@@ -115,11 +116,11 @@ io.on('connection', async (socket) => {
             delete newProto.webdriver;
             navigator.__proto__ = newProto;
         });
-        const client = tabs[lastTabId].client = await tabs[lastTabId].page.createCDPSession();
-        client.on('Page.screencastFrame', async ({ data, sessionId }) => {
-            socket.emit('screenshot', data);
-            await client.send('Page.screencastFrameAck', { sessionId });
-        });
+        // const client = tabs[lastTabId].client = await tabs[lastTabId].page.createCDPSession();
+        // client.on('Page.screencastFrame', async ({ data, sessionId }) => {
+        //     socket.emit('screenshot', data);
+        //     await client.send('Page.screencastFrameAck', { sessionId });
+        // });
         socket.emit("tabCreated", lastTabId);
         await tabs[lastTabId].page.goto('https://google.com');
         return lastTabId++;
