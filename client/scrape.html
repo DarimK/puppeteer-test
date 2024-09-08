@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Scraper</title>
+</head>
+
+<body>
+    <h1>Image Scraper</h1>
+    <textarea id="urlInput" placeholder="Enter URLs, one per line" rows="10" cols="50"></textarea>
+    <br><br>
+    <button id="captureBtn">Scrape</button>
+    <button id="captureBtnB">Scrape Browserless</button>
+    <br><br>
+    <ol id="images"></ol>
+    <h1 id="total">Total: 0</h1>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io((window.location.hostname === "localhost") ? "/" : "https://puppeteer-test-ptgg.onrender.com/");
+
+        document.getElementById('captureBtn').addEventListener('click', () => {
+            const urls = document.getElementById('urlInput').value.split('\n').filter(url => url.trim() !== '');
+            socket.emit('imageUrls', urls);
+        });
+
+        document.getElementById('captureBtnB').addEventListener('click', () => {
+            const urls = document.getElementById('urlInput').value.split('\n').filter(url => url.trim() !== '');
+            socket.emit('imageUrlsB', urls);
+        });
+
+        socket.on('imageUrls', (data) => {
+            console.log(data);
+            let total = 0;
+            const imagesList = document.getElementById('images');
+            imagesList.innerHTML = '';
+            data.forEach((obj) => {
+                const mainLi = document.createElement('li');
+                const url = document.createElement('code');
+                url.innerHTML = obj.url;
+                mainLi.appendChild(url);
+                const ol = document.createElement('ol');
+                obj.images.forEach((img) => {
+                    if (img) {
+                        const imgUrl = document.createElement('code');
+                        imgUrl.innerHTML = img;
+                        const li = document.createElement('li');
+                        li.appendChild(imgUrl);
+                        ol.appendChild(li);
+                        total++;
+                    }
+                });
+                mainLi.appendChild(ol);
+                imagesList.appendChild(mainLi);
+            });
+            const totalImages = document.getElementById('total');
+            totalImages.innerHTML = `Total: ${total}`;
+        });
+
+        socket.on('error', (error) => {
+            alert('Error: ' + error);
+        });
+    </script>
+</body>
+
+</html>

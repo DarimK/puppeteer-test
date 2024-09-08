@@ -9,4 +9,4 @@ WORKDIR /usr/src/app
 COPY package*.json .
 RUN npm ci
 COPY . .
-CMD [ "node", "server/index.js" ]
+CMD [ "node", "server/index2.js" ]

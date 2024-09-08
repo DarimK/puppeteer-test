@@ -9,7 +9,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "http://render.com",
         methods: ["GET", "POST"]
     }
 });
@@ -45,7 +45,7 @@ io.on('connection', async (socket) => {
     const tabs = {};
     const browser = await puppeteer.launch({
         executablePath: process.env.NODE_ENV === "production" ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath(),
-        headless: true,
+        headless: 'new',
         protocolTimeout: 5000,
         args: [
             '--incognito',
