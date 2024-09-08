@@ -132,7 +132,10 @@ io.on('connection', (socket) => {
 const extractImagesFromUrls = async (urls) => {
     const extractImages = async (url, page) => {
         try {
-            await page.goto(url, { waitUntil: 'networkidle2' });
+            await page.goto(url, {
+                waitUntil: 'networkidle2',
+                timeout: 120000
+            });
 
             const imageUrls = await page.evaluate(() =>
                 Array.from(document.images, img => img.src)

@@ -7,7 +7,7 @@ const headers = {
 
 const options = {
     headers,
-    timeout: 5000,
+    timeout: 30000,
     responseType: 'text'
 };
 
