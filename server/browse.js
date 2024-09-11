@@ -53,7 +53,7 @@ async function browse(socket, page) {
 
     async function capture() {
         try {
-            const screenshot = await page.screenshot({ type: 'jpeg', quality: 25 });
+            const screenshot = await page.screenshot({ type: 'jpeg', quality: 25, timeout: 5000 });
             socket.emit('screenshot', screenshot.toString('base64'));
         } catch (error) {
             console.error(error);

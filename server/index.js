@@ -37,7 +37,7 @@ let pages = {};
         executablePath: process.env.NODE_ENV === 'production' ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath(),
         headless: 'new',
         defaultViewport: null,
-        protocolTimeout: 5000,
+        protocolTimeout: 60000,
         args: [
             '--incognito',
             '--enable-low-end-device-mode',
