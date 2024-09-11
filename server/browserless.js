@@ -29,6 +29,18 @@ async function extractImagesFromUrlsBrowserless(urls) {
     const imageUrlsPerPage = await Promise.all(urls.map(fetchImages));
 
     return imageUrlsPerPage;
-};
+}
 
-module.exports = { extractImagesFromUrlsBrowserless };
+function scrapeB(socket) {
+    socket.on('imageUrls', async (urls) => {
+        try {
+            const images = await extractImagesFromUrlsBrowserless(urls);
+            socket.emit('imageUrls', images);
+        } catch (error) {
+            socket.emit('error', error.toString());
+            console.error(error);
+        }
+    });
+}
+
+module.exports = { scrapeB };

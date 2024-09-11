@@ -10,7 +10,6 @@
 
 <body>
     <noscript>Please enable JavaScript</noscript>
-    <div id="tabs"></div>
     <div id="controls">
         <input type="text" id="urlInput" placeholder="Enter URL">
         <button id="go">Go</button>
@@ -21,9 +20,11 @@
         <button id="scrollDown">Scroll Down</button>
         <button id="scrollLeft">Scroll Left</button>
         <button id="scrollRight">Scroll Right</button>
-        <button id="createTab">New Tab</button>
+        <button id="captureBtn">Scrape</button>
     </div>
     <img id="screen" src="" alt="Screen">
+    <ol id="images"></ol>
+    <h1 id="total">Total: 0</h1>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
     <script src="script.js"></script>
 </body>
