@@ -16,26 +16,6 @@ socket.on('screenshot', (data) => {
     frameTotal++;
 });
 
-// socket.on("tabCreated", (data) => {
-//     const tab = document.createElement("div");
-//     tab.style.display = "inline";
-//     const open = document.createElement("button");
-//     open.innerHTML = data;
-//     open.onclick = () => {
-//         socket.emit("switchTab", data);
-//     };
-//     const close = document.createElement("button");
-//     close.innerHTML = "x";
-//     close.onclick = () => {
-//         socket.emit("deleteTab", data);
-//         document.getElementById("tabs").removeChild(tab);
-//     };
-//     tab.appendChild(open);
-//     tab.appendChild(close);
-//     document.getElementById("tabs").appendChild(tab);
-//     console.log(data);
-// });
-
 document.addEventListener('mousedown', (event) => {
     const img = document.getElementById('screen');
     const rect = img.getBoundingClientRect();
@@ -132,12 +112,12 @@ document.getElementById('scrollRight').addEventListener('click', () => {
     socket.emit('scroll', { direction: 'right' });
 });
 
-// document.getElementById('createTab').addEventListener('click', () => {
-//     socket.emit('createTab');
-// });
-
 document.getElementById('captureBtn').addEventListener('click', () => {
     socket.emit('scrapePage');
+});
+
+document.getElementById('screenshot').addEventListener('click', () => {
+    socket.emit('screenshot');
 });
 
 socket.on('imageUrls', (data) => {

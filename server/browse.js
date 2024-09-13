@@ -53,7 +53,6 @@ async function browse(socket, page) {
 
     function closeConnection() {
         console.log('uh oh');
-        clearInterval(missingframesidk);
         clearInterval(lastInputInterval);
     }
 
@@ -107,7 +106,8 @@ async function browse(socket, page) {
     // }
     // thing();
 
-    const missingframesidk = setInterval(capture, 1000);
+    await capture();
+    socket.on('screenshot', capture);
 
     //setup touch as well
     socket.on('mouse', async (data) => {//distinguish between left,right,middle (maybe add back,fwd)
