@@ -16,3 +16,10 @@ body {
     -webkit-user-drag: none;
     user-select: none;
 }
+
+#images code {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80vw;
+}

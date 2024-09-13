@@ -43,4 +43,27 @@ function scrapeB(socket) {
     });
 }
 
-module.exports = { scrapeB };
+async function fetchFile(socket, url, base64 = true) {
+    try {
+        if (url.startsWith('data:')) {
+            const [header, fileData] = url.split(',');
+            const contentType = header.split(':')[1].split(';')[0];
+
+            socket.emit('fileData', { contentType, fileData });
+        } else {
+            const newOptions = { ...options };
+            newOptions.responseType = 'arraybuffer';
+            const response = await axios.get(url, newOptions);
+
+            const contentType = response.headers['content-type'];
+            const fileData = base64 ? Buffer.from(response.data, 'binary').toString('base64') : response.data;
+
+            socket.emit('fileData', { contentType, fileData });
+        }
+    } catch (error) {
+        socket.emit('error', error.toString());
+        console.error(error);
+    }
+}
+
+module.exports = { scrapeB, fetchFile };

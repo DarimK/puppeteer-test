@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer');
 require('dotenv').config();
 const { browse } = require('./browse');
 const { scrape, scrapePage } = require('./scrape');
-const { scrapeB } = require('./browserless');
+const { scrapeB, fetchFile } = require('./browserless');
 
 const app = express();
 const server = http.createServer(app);
@@ -90,15 +90,7 @@ let pages = {};
             delete newProto.webdriver;
             navigator.__proto__ = newProto;
         });
-        page.on('framenavigated', async (frame) => {
-            if (frame === page.mainFrame()) {
-                await page.evaluate(() => {
-                    document.querySelectorAll('[target]').forEach(element => {
-                        element.removeAttribute('target');
-                    });
-                });
-            }
-        });
+        
         // await page.setRequestInterception(true);
         // page.on('request', (request) => {
         //     const resourceType = request.resourceType();
@@ -137,6 +129,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('scrapePage', () => scrapePage(socket, pages[pageInUse].page));
+
+    socket.on('fetchFile', (url) => fetchFile(socket, url));
 
     socket.on('scrape', () => scrape(socket, pages));
 

@@ -1,14 +1,36 @@
-const navigateOptions = { waitUntil: 'networkidle2', timeout: 120000 };
+const navigateOptions = { waitUntil: 'networkidle2', timeout: 300000 };
 
-// async function isPageActive(page) {
-//     try {
-//         return await page.evaluate(() => document.visibilityState === 'visible');
-//     } catch (error) {
-//         return undefined;
-//     }
-// }
+async function isPageActive(page) {
+    try {
+        return await page.evaluate(() => document.visibilityState === 'visible');
+    } catch (error) {
+        return undefined;
+    }
+}
+
+async function ssForceTimeout(page, options, timeout) {
+    return Promise.race([
+        page.screenshot(options),
+        new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('screenshot timed out')), timeout)
+        )
+    ]);
+}
 
 async function browse(socket, page) {
+    page.on('framenavigated', async (frame) => {
+        try {
+            if (frame === page.mainFrame()) {
+                await page.evaluate(() => {
+                    document.querySelectorAll('[target]').forEach(element => {
+                        element.removeAttribute('target');
+                    });
+                });
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    });
     page.on('dialog', async (dialog) => {
         console.log(dialog.message());
         await dialog.accept(); // might show usr laret
@@ -18,7 +40,7 @@ async function browse(socket, page) {
     let lastInput = 0;
     const lastInputInterval = setInterval(() => {
         // console.log(lastInput);
-        if (lastInput >= 60) {
+        if (lastInput >= 300) {
             if (socket.connected) {
                 socket.disconnect();
             } else {
@@ -53,8 +75,10 @@ async function browse(socket, page) {
 
     async function capture() {
         try {
-            const screenshot = await page.screenshot({ type: 'jpeg', quality: 25, timeout: 5000 });
-            socket.emit('screenshot', screenshot.toString('base64'));
+            if (isPageActive(page)) {
+                const screenshot = await ssForceTimeout(page, { type: 'jpeg', quality: 25 }, 5000);
+                socket.emit('screenshot', screenshot.toString('base64'));
+            }
         } catch (error) {
             console.error(error);
         }
@@ -150,13 +174,13 @@ async function browse(socket, page) {
         lastInput = 0;
         try {
             if (data.direction === 'up') {
-                await page.evaluate(() => window.scrollBy(0, -100));
+                await page.evaluate(() => window.scrollBy(0, -window.innerHeight / 2));
             } else if (data.direction === 'down') {
-                await page.evaluate(() => window.scrollBy(0, 100));
+                await page.evaluate(() => window.scrollBy(0, window.innerHeight / 2));
             } else if (data.direction === 'left') {
-                await page.evaluate(() => window.scrollBy(-100, 0));
+                await page.evaluate(() => window.scrollBy(-100, window.innerWidth / 2));
             } else if (data.direction === 'right') {
-                await page.evaluate(() => window.scrollBy(100, 0));
+                await page.evaluate(() => window.scrollBy(100, window.innerWidth / 2));
             }
         } catch { }
         console.log(data);

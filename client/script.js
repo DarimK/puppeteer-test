@@ -153,10 +153,18 @@ socket.on('imageUrls', (data) => {
         const ol = document.createElement('ol');
         obj.images.forEach((img) => {
             if (img) {
+                const li = document.createElement('li');
                 const imgUrl = document.createElement('code');
                 imgUrl.innerHTML = img;
-                const li = document.createElement('li');
                 li.appendChild(imgUrl);
+                const fetchButton = document.createElement('button');
+                fetchButton.innerHTML = 'fetch';
+                fetchButton.onclick = () => {
+                    fetchButton.parentElement.removeChild(fetchButton);
+                    socket.emit('fetchFile', img);
+                };
+                li.appendChild(document.createElement('br'));
+                li.appendChild(fetchButton);
                 ol.appendChild(li);
                 total++;
             }
@@ -166,6 +174,17 @@ socket.on('imageUrls', (data) => {
     });
     const totalImages = document.getElementById('total');
     totalImages.innerHTML = `Total: ${total}`;
+});
+
+socket.on('fileData', (data) => {
+    const { contentType, fileData } = data;
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.innerHTML = contentType;
+    a.href = `data:${contentType};base64,${fileData}`;
+    a.download = "";
+    li.appendChild(a);
+    document.getElementById('downloads').appendChild(li);
 });
 
 socket.on('error', (error) => {
