@@ -3,7 +3,7 @@ async function extractImages(page, url = page.url()) {
         if (url && url !== page.url()) {
             await page.goto(url, {
                 waitUntil: 'networkidle2',
-                timeout: 120000
+                timeout: 300000
             });
         }
 
@@ -18,10 +18,10 @@ async function extractImages(page, url = page.url()) {
     }
 }
 
-const extractImagesFromUrls = async (urls, pages) => {
+async function extractImagesFromUrls(urls, pages) {
     const results = [];
 
-    const processQueue = async (id) => {
+    for (const id in pages) {
         if (!pages[id].inUse) {
             pages[id].inUse = true;
             while (urls.length > 0) {
@@ -30,14 +30,9 @@ const extractImagesFromUrls = async (urls, pages) => {
                 results.push(result);
             }
             pages[id].inUse = false;
+            break;
         }
-    };
-
-    const workers = [];
-    for (const id in pages) {
-        workers.push(processQueue(id));
     }
-    await Promise.all(workers);
 
     return results;
 }
