@@ -23,3 +23,8 @@ body {
     text-overflow: ellipsis;
     max-width: 80vw;
 }
+
+#downloads img {
+    width: auto;
+    height: 100px;
+}

@@ -53,4 +53,43 @@ async function scrapePage(socket, page) {
     socket.emit('imageUrls', [await extractImages(page)]);
 }
 
-module.exports = { scrape, scrapePage };
+async function grabEverything(socket, page) {
+    await page.setRequestInterception(true);
+
+    page.on('request', async (request) => {
+        if (request.resourceType() === 'image') {
+            try {
+                const imageUrl = request.url();
+
+                const base64Image = await page.evaluate(async (url) => {
+                    try {
+                        const response = await fetch(url);
+                        const blob = await response.blob();
+                        const reader = new FileReader();
+
+                        return new Promise((resolve, reject) => {
+                            reader.onloadend = () => {
+                                const base64data = reader.result.split(',')[1];
+                                resolve(base64data);
+                            };
+                            reader.onerror = reject;
+                            reader.readAsDataURL(blob);
+                        });
+                    } catch {
+                        return null;
+                    }
+                }, imageUrl);
+
+                if (base64Image) {
+                    const contentType = request.headers()['content-type'] || 'image/jpeg'; // Default to jpeg if unknown
+                    socket.emit('fileData', { contentType, fileData: base64Image });
+                }
+            } catch { }
+            request.abort();
+        } else {
+            request.continue();
+        }
+    });
+}
+
+module.exports = { scrape, scrapePage, grabEverything };

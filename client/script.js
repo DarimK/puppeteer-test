@@ -116,6 +116,11 @@ document.getElementById('captureBtn').addEventListener('click', () => {
     socket.emit('scrapePage');
 });
 
+document.getElementById('grabEverything').addEventListener('click', () => {
+    document.getElementById('grabEverything').parentElement.removeChild(document.getElementById('grabEverything'));
+    socket.emit('grabEverything');
+});
+
 document.getElementById('screenshot').addEventListener('click', () => {
     socket.emit('screenshot');
 });
@@ -156,14 +161,23 @@ socket.on('imageUrls', (data) => {
     totalImages.innerHTML = `Total: ${total}`;
 });
 
+// socket.on('fileData', (data) => {
+//     const { contentType, fileData } = data;
+//     const li = document.createElement('li');
+//     const a = document.createElement('a');
+//     a.innerHTML = contentType;
+//     a.href = `data:${contentType};base64,${fileData}`;
+//     a.download = "";
+//     li.appendChild(a);
+//     document.getElementById('downloads').appendChild(li);
+// });
 socket.on('fileData', (data) => {
     const { contentType, fileData } = data;
     const li = document.createElement('li');
-    const a = document.createElement('a');
-    a.innerHTML = contentType;
-    a.href = `data:${contentType};base64,${fileData}`;
-    a.download = "";
-    li.appendChild(a);
+    const img = document.createElement('img');
+    img.alt = contentType;
+    img.src = `data:${contentType};base64,${fileData}`;
+    li.appendChild(img);
     document.getElementById('downloads').appendChild(li);
 });
 

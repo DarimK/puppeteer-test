@@ -5,7 +5,7 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 require('dotenv').config();
 const { browse } = require('./browse');
-const { scrape, scrapePage } = require('./scrape');
+const { scrape, scrapePage, grabEverything } = require('./scrape');
 const { scrapeB, fetchFile } = require('./browserless');
 
 const app = express();
@@ -129,6 +129,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('scrapePage', () => scrapePage(socket, pages[pageInUse].page));
+
+    socket.on('grabEverything', () => grabEverything(socket, pages[pageInUse].page));
 
     socket.on('fetchFile', (url) => fetchFile(socket, url));
 
